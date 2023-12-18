@@ -37,7 +37,7 @@ bool bPrimeMillerRobin(long long n, int k = 5) {
 }
 
 // Función para generar un número primo aleatorio utilizando Miller-Rabin
-long long randomPrimeGenerator(long long limit) {
+unsigned long long randomPrimeGenerator(long long limit) {
     // Generar números aleatorios en el rango [2, limite]
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -52,7 +52,7 @@ long long randomPrimeGenerator(long long limit) {
     return randomNumber;
 }
 
-long long GCD(long long a, long long b){
+unsigned long long GCD(long long a, long long b){
     long long quoficient_temp;
     long long residuos_temp;
 
@@ -69,7 +69,7 @@ long long GCD(long long a, long long b){
     return a;
 }
 
-long long e_creation(long long int an){
+unsigned long e_creation(long long int an){
     int _e = 65537;
 
     int comprovation_e = GCD(_e, an);
@@ -77,18 +77,16 @@ long long e_creation(long long int an){
         return _e;
     }
 
-    for(int e = an - 1; e < an && e > 2; e--){
-        int comprovation_e = GCD(e, an);
-        if(2 < e < an && comprovation_e == 1){
-            _e += e;
-            break;
+    for(int e = an - 1; e >= 2; e--){
+        if(GCD(e, an) == 1){
+            return e;
         }
     }
 
-    return _e;
+    return 0;
 }
 
-long long d_creation(int a, long long an){
+unsigned long long d_creation(int a, long long an){
     long long m0 = an, t, q;
     long long x0 = 0, x1 = 1;
 
@@ -106,54 +104,48 @@ long long d_creation(int a, long long an){
         x1 = t;
     }
 
-    if (x1 < 0) x1 += m0;
+    if (x1 < 0) {
+        x1 += m0;
+    }
 
     return x1;
 
 }
 
-long long RSA_encryption(int message, unsigned long long int an, unsigned long long int e){
-
+unsigned long long modPow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
+    base %= modulus;
     unsigned long long result = 1;
-    message = message % an;
-
-    while (e > 0) {
-        if (e % 2 == 1) {
-            result = (result * message) % an;
-        }
-
-        e = e >> 1;
-        message = (message * message) % an;
+    while (exp > 0) {
+        if (exp & 1) result = (result * base) % modulus;
+        base = (base * base) % modulus;
+        exp >>= 1;
     }
-
     return result;
 }
 
-long long RSA_decryption(long long cypher_Message, unsigned long long int an, unsigned long long int d){
+unsigned long long RSA_encryption(int message, unsigned long long int an, unsigned long long int e){
 
-    unsigned long long result = 1;
-    cypher_Message = cypher_Message % an;
+    return modPow(message, e, an);
+}
 
-    while (d > 0) {
-        if (d % 2 == 1) {
-            result = (result * cypher_Message) % an;
-        }
+unsigned long long RSA_decryption(long long cypher_Message, unsigned long long int an, unsigned long long int d){
 
-        d = d >> 1;
-        cypher_Message = (cypher_Message * cypher_Message) % an;
-    }
-
-    return result;
+    return modPow(cypher_Message, d, an);
 }
 
 int main() {
     
-    unsigned long p_primeNumber = randomPrimeGenerator(1000000);
-    unsigned long long q_primeNumber = randomPrimeGenerator(1000000);
+    unsigned long long p_primeNumber = randomPrimeGenerator(100000);
+    unsigned long long q_primeNumber = randomPrimeGenerator(100000);
+
+    if (p_primeNumber > 0 && q_primeNumber > std::numeric_limits<unsigned long long>::max() / p_primeNumber) {
+        std::cerr << "Error: Multiplication would overflow.\n";
+        return 1;  // Return an error code
+    }
 
     unsigned long long n_primeNumber = p_primeNumber * q_primeNumber;
     
-    unsigned long long int an = n_primeNumber / GCD(p_primeNumber -1, q_primeNumber -1);
+    unsigned long long int an = (p_primeNumber - 1) * (q_primeNumber - 1);
 
     unsigned long long e_publicKey = e_creation(an);
     
@@ -168,8 +160,8 @@ int main() {
     int message; 
     std::cin >> message;
 
-    unsigned long long  encrypted_Message = RSA_encryption(message, an, e_publicKey);
-    int decrypted_Message = RSA_decryption(encrypted_Message,an ,d_privateKey);
+    unsigned long long  encrypted_Message = RSA_encryption(message, n_primeNumber, e_publicKey);
+    int decrypted_Message = RSA_decryption(encrypted_Message,n_primeNumber ,d_privateKey);
 
     std::cout << "\n" << "Encrypted Message: "<< encrypted_Message;
     std::cout << "\n" << "Decrypted Message: " << decrypted_Message;
