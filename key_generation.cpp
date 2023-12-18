@@ -85,7 +85,7 @@ unsigned long e_creation(long long int an){
 
     return 0;
 }
-
+//a
 unsigned long long d_creation(int a, long long an){
     long long m0 = an, t, q;
     long long x0 = 0, x1 = 1;
