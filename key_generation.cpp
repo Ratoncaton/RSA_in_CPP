@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cmath>
 #include <random>
-#include <fstream>
-#include <dirent.h>
 
 bool bPrimeMillerRobin(long long n, int k = 5) {
     if (n <= 1 || n == 4) return false;
@@ -147,65 +145,9 @@ void toFile(std::string fileName, unsigned long long int n, unsigned long long i
     file2 << n << "\n" << e << "\n";
 }
 
-unsigned long long int fromPubFile(){
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir ("./")) != NULL) {
-        while ((ent = readdir (dir)) != NULL) {
-            std::string filename = ent->d_name;
-            std::string extension = filename.substr(filename.find_last_of(".") + 1);
-            if (extension == "pub") {
-                
-                std::ifstream infile(filename);
-                if (infile.good()) {
-                    std::string line;
-                    std::getline(infile, line);
-                    unsigned long long int n = std::stoull(line);
-                    std::getline(infile, line);
-                    unsigned long long int e = std::stoull(line);
-                    
-                    return std::make_tuple(n, e);
-                }
-            }
-        }
-        closedir (dir);
-    }else{
-        return 0;
-    }
-    
-    return 0;
-}
 
-unsigned long long fromPrivFile(){
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir ("./")) != NULL) {
-        while ((ent = readdir (dir)) != NULL) {
-            std::string filename = ent->d_name;
-            std::string extension = filename.substr(filename.find_last_of(".") + 1);
-            if (extension == "priv") {
-                
-                std::ifstream infile(filename);
-                if (infile.good()) {
-                    std::string line;
-                    std::getline(infile, line);
-                    unsigned long long int n = std::stoull(line);
-                    std::getline(infile, line);
-                    unsigned long long int d = std::stoull(line);
-                    
-                    return d;
-                }
-            }
-        }
-        closedir (dir);
-    }else{
-        return 0;
-    }
+int main() {
     
-    return 0;
-}
-
-unsigned long long keyGeneration(){
     unsigned long long p_primeNumber = randomPrimeGenerator(100000);
     unsigned long long q_primeNumber = randomPrimeGenerator(100000);
 
@@ -222,34 +164,15 @@ unsigned long long keyGeneration(){
     
     unsigned long long d_privateKey =  d_creation(e_publicKey, an);
 
-    return std::make_tuple(n_primeNumber, e_publicKey, d_privateKey);
-}
-
-int main() {
-    
-    unsigned long long int n = 0;
-    unsigned long long int e = 0;
-    unsigned long long int d = 0;
-
-    std::tie(n, e) = fromPubFile();
-    d = fromPrivFile();
-
-    if (n <= 0 && e <= 0){
-        n, e, d = keyGeneration();
-    }
-    else if (d <= 0){
-        std::tie(n, e, d) = keyGeneration();
-    }
-
-    toFile("key", n, e, d);
+    toFile("key", n_primeNumber, e_publicKey, d_privateKey);
 
     std::cout << "Put a number to encrypt: ";
     
     int message; 
     std::cin >> message;
 
-    unsigned long long  encrypted_Message = RSA_encryption(message, n, e);
-    int decrypted_Message = RSA_decryption(encrypted_Message,n ,d);
+    unsigned long long  encrypted_Message = RSA_encryption(message, n_primeNumber, e_publicKey);
+    int decrypted_Message = RSA_decryption(encrypted_Message,n_primeNumber ,d_privateKey);
 
     std::cout << "\n" << "Encrypted Message: "<< encrypted_Message;
     std::cout << "\n" << "Decrypted Message: " << decrypted_Message;
