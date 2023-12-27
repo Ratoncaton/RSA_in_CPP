@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 } */
 
 std::array<long long unsigned int, 2> openFile(){
-    std::string path = "."; // The current directory
+    std::string path = "D:\\VSC_Code\\CPP\\Cryptography\\RSA"; // The current directory
     std::string extension = ".pub"; // search public key
 
     for (const auto & entry : std::filesystem::directory_iterator(path)) {
@@ -41,10 +41,8 @@ std::array<long long unsigned int, 2> openFile(){
             std::array<long long unsigned int, 2> key;
 
             for(int i = 0; i <= 2;i++){
-               if(!(file >> key[i])){
-                   std::array<long long unsigned int, 2> fail = {1, 1};
-                   return fail;
-               }
+               file >> key[i];
+               
             }
 
             // Close the file
