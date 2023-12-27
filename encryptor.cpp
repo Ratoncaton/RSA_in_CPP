@@ -90,6 +90,8 @@ std::vector<int> encryption(std::vector<int> message, unsigned long long int n, 
 
 int main(){
 
+    //TODO: make it command line compatible
+
     std::array<long long unsigned int, 2> key = openFile();
 
     if (key[0] == 1 && key[1] == 1){
