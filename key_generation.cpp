@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <random>
+#include <fstream>
 
 bool bPrimeMillerRobin(long long n, int k = 5) {
     if (n <= 1 || n == 4) return false;
@@ -123,15 +124,6 @@ unsigned long long modPow(unsigned long long base, unsigned long long exp, unsig
     return result;
 }
 
-unsigned long long RSA_encryption(int message, unsigned long long int an, unsigned long long int e){
-
-    return modPow(message, e, an);
-}
-
-unsigned long long RSA_decryption(long long cypher_Message, unsigned long long int an, unsigned long long int d){
-
-    return modPow(cypher_Message, d, an);
-}
 
 void toFile(std::string fileName, unsigned long long int n, unsigned long long int e, unsigned long long int d){
     std::ofstream file;
@@ -148,6 +140,8 @@ void toFile(std::string fileName, unsigned long long int n, unsigned long long i
 
 int main() {
     
+    //TODO: make it command line compatible
+
     unsigned long long p_primeNumber = randomPrimeGenerator(100000);
     unsigned long long q_primeNumber = randomPrimeGenerator(100000);
 
@@ -163,19 +157,19 @@ int main() {
     unsigned long long e_publicKey = e_creation(an);
     
     unsigned long long d_privateKey =  d_creation(e_publicKey, an);
-
-    toFile("key", n_primeNumber, e_publicKey, d_privateKey);
-
-    std::cout << "Put a number to encrypt: ";
     
-    int message; 
-    std::cin >> message;
+    std::string keyName;
 
-    unsigned long long  encrypted_Message = RSA_encryption(message, n_primeNumber, e_publicKey);
-    int decrypted_Message = RSA_decryption(encrypted_Message,n_primeNumber ,d_privateKey);
+    std::cout << "Enter name of the key files (key by default): ";
+    std::getline(std::cin, keyName);
 
-    std::cout << "\n" << "Encrypted Message: "<< encrypted_Message;
-    std::cout << "\n" << "Decrypted Message: " << decrypted_Message;
+    if( keyName == ""){
+        keyName = "key";
+    }
+
+    toFile(keyName, n_primeNumber, e_publicKey, d_privateKey);
     
+    std::cout << "Keys generated correctly\n";
+
     return 0;
 }
