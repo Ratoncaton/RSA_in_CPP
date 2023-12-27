@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 } */
 
 std::array<long long unsigned int, 2> openFile(){
-    std::string path = "D:\\VSC_Code\\CPP\\Cryptography\\RSA"; // The current directory
+    std::string path = "."; // The current directory
     std::string extension = ".pub"; // search public key
 
     for (const auto & entry : std::filesystem::directory_iterator(path)) {
@@ -42,7 +42,7 @@ std::array<long long unsigned int, 2> openFile(){
 
             for(int i = 0; i <= 2;i++){
                file >> key[i];
-               
+
             }
 
             // Close the file
@@ -76,6 +76,16 @@ std::vector<int> String_To_Ascii(const std::string& message){
     return ascii;
 }
 
+std::vector<int> encryption(std::vector<int> message, unsigned long long int n, unsigned long long int e){
+
+    std::vector<int> cypher_Message;
+
+    for(int m : message){
+        cypher_Message.push_back(modPow(m, e, n));
+    }
+
+    return cypher_Message;
+}
 
 
 int main(){
@@ -92,7 +102,9 @@ int main(){
     std::cin >> message;
     std::vector<int> mAscii = String_To_Ascii(message);
 
-    for(int m : mAscii){
+    std::vector<int> cAscii = encryption(mAscii, key[0], key[1]);
+
+    for(int m : cAscii){
         std::cout << m << "\n";
     }
 
