@@ -7,6 +7,23 @@
 #include <vector>
 #include <sstream>
 
+std::array<long long unsigned int, 2> specificOpenFile(std::string fileName){
+    
+    std::array<long long unsigned int, 2> key;
+    std::string path = "./" + fileName + ".priv";
+    std::ifstream file(path);
+
+    if(!file){
+        return {1, 1};
+    }
+    std::string line;
+    for(int i = 0; i <= 2;i++){
+        file >> key[i];
+    }
+    
+    return key;
+}
+
 std::array<long long unsigned int, 2> openFile(){
     std::string path = "."; // The current directory
     std::string extension = ".priv"; // search public key
@@ -83,11 +100,23 @@ std::vector<int> splitStringToInts(const std::string& str) {
     return numbers;
 }
 
-int main(){
+int main(int argc, char* argv[]){
 
     //TODO: make it command line compatible
+    std::array<long long unsigned int, 2> key;
+    
+    if(argc == 1){
+        key = openFile();
+    }
+    else if (argc == 2){
+        key = specificOpenFile(argv[1]);
+    }
+    else if(argc > 2){
+        std::cout << "Too many arguments, please enter one public key file name or none\n";
+        return 1;
+    }
+
     std::string cMessage;
-    std::array<long long unsigned int, 2> key = openFile();
 
     if (key[0] == 1 && key[1] == 1){
         std::cout << "Something has gone wrong, please check if the .pub file is in the folder";
