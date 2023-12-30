@@ -16,12 +16,28 @@ std::array<long long unsigned int, 2> specificOpenFile(std::string fileName){
     if(!file){
         return {1, 1};
     }
-    std::string line;
+
     for(int i = 0; i <= 2;i++){
         file >> key[i];
     }
     
     return key;
+}
+
+std::vector<int> openMessageFile(std::string fileName){
+    std::vector<int> message;
+    std::string path = "./" + fileName + ".msg";
+    std::ifstream file(path);
+
+    if(!file){
+        return {1};
+    }
+
+    for(int i = 0; i <= sizeof(file); i++){
+        file >> message[i];
+    }
+
+    return message;
 }
 
 std::array<long long unsigned int, 2> openFile(){
@@ -68,9 +84,6 @@ unsigned long long modPow(unsigned long long base, unsigned long long exp, unsig
     return result;
 }
 
-
-
-
 std::vector<char> Ascii_To_String(const std::vector<int>& message){
     
     std::vector<char> ascii;
@@ -102,37 +115,70 @@ std::vector<int> splitStringToInts(const std::string& str) {
 
 int main(int argc, char* argv[]){
 
-    //TODO: make it command line compatible
     std::array<long long unsigned int, 2> key;
-    
+    std::string cMessage = "";
+    std::vector<int> vCMessage;
+    std::vector<int> cMessageInts = {};
+
     if(argc == 1){
         key = openFile();
     }
-    else if (argc == 2){
-        key = specificOpenFile(argv[1]);
-    }
-    else if(argc > 2){
-        std::cout << "Too many arguments, please enter one public key file name or none\n";
-        return 1;
-    }
+    else if (argc > 2){
+        std::string option = argv[1];
+        if(option == "-f"){
+            key = specificOpenFile(argv[2]);
+        }
+        else if(option == "-m"){
+            vCMessage = openMessageFile(argv[2]);
+        }
+        else if(option == "-fm"){
+            key = specificOpenFile(argv[2]);
+            vCMessage = openMessageFile(argv[3]);
+        }
+        else if(option == "-h"){
+            std::cout << "option -h entered\n";
+            std::cout << "Usage: decryptor [OPTION] [FILE]\n";
+            std::cout << "Decrypts a message using the private key in the .priv file\n";
+            std::cout << "REMINDER:\n";
+            std::cout << "- The .priv file and .msg file has to be in the same directory as the program\n";
+            std::cout << "- It is not necessary to put the extension of the files\n";
 
-    std::string cMessage;
+            std::cout << "\n" << "Options:\n";
+            std::cout << "-f = specify a private key file name (.priv)\n";
+            std::cout << "If no option is given, the program will search for a .priv file in the current directory\n";
+
+            std::cout << "\n" << "-m = specify a message file name (.msg)\n";
+            std::cout <<"If no option is given, the program will ask for a messsage, every message has to be separated with blank spaces\n";
+
+            std::cout << "\n" << "-fm = specify both a private key file name (.priv) and a message file name (.msg) in this order\n";
+            std::cout << "The order is: decryptor -fm [private key file name] [message file name]\n";
+            return 0;
+       }
+        else{
+            std::cout << "Invalid option, please use -h for help\n";
+            return 1;
+        }
+    
+    }
 
     if (key[0] == 1 && key[1] == 1){
-        std::cout << "Something has gone wrong, please check if the .pub file is in the folder";
+        std::cout << "Something has gone wrong, please check if the .priv file is in the folder";
         return 1;
     }
 
+    if(vCMessage.size() == 0){
     std::cout << "Enter the message you want to decrypt: ";
     std::getline(std::cin, cMessage);
 
-    std::vector<int> cMessageInts = splitStringToInts(cMessage);
+    cMessageInts = splitStringToInts(cMessage);
+    }
+    else{
+        cMessageInts = vCMessage;
+    }
 
     std::vector<int> aMessage = decryption(cMessageInts, key[0], key[1]);
 
     std::vector<char> oMessage = Ascii_To_String(aMessage);
-
-    
 
     for(char i : oMessage){
         std::cout << i << "";
@@ -140,5 +186,3 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
-
-
