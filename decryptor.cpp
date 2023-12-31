@@ -32,7 +32,8 @@ std::vector<long long unsigned int> openMessageFile(std::string fileName){
     std::ifstream file(path);
 
     if(!file){
-        return {1};
+        message.push_back(1);
+        return message;
     }
     
     int num;
@@ -128,16 +129,25 @@ int main(int argc, char* argv[]){
     }
     else{
         for (int i = 1; i < argc; ++i) {
-            if (std::strcmp(argv[i], "-f") == 0) {
+            if (std::strcmp(argv[i], "-f") == 0 && i + 1 < argc) {
+
                 key = specificOpenFile(argv[i + 1]);
                 break;
 
-            } else if (std::strcmp(argv[i], "-m") == 0) {
+            } else if (std::strcmp(argv[i], "-m") == 0 && i + 1 < argc) {
                 vCMessage = openMessageFile(argv[i + 1]);
+            
+                if(vCMessage[0] = 1){
+                    std::cout << "Something has gone wrong, please check if the .msg file is in the folder";
+                    return 1;
+                }
+
                 key = openFile();
                 break;
 
-            } else if(std::strcmp(argv[i], "-fm") == 0){
+            } else if(std::strcmp(argv[i], "-fm") == 0 && i + 1 < argc && i + 2 < argc){
+            
+
                 key = specificOpenFile(argv[i + 1]);
                 vCMessage = openMessageFile(argv[i + 2]);
                 break;
