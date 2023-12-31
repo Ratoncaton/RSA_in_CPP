@@ -6,21 +6,6 @@
 #include <string>
 #include <vector>
 
-/* Command line comprovation :)
-
-int main(int argc, char* argv[]){
-    if (argc >= 4){
-        std::cerr << "Input: " << argv[0];
-        return 1;
-    }
-
-    std::string arg1 = argv[1];
-    std::string arg2 = argv[2];
-
-    std::cout << arg1 << " " << arg2 << std::endl;
-    return 0;
-} */
-
 std::array<long long unsigned int, 2> specificOpenFile(std::string fileName){
     
     std::array<long long unsigned int, 2> key;
@@ -104,10 +89,19 @@ std::vector<int> encryption(std::vector<int> message, unsigned long long int n, 
     return cypher_Message;
 }
 
+void toFile(std::vector<int> cMessage, std::string fileName){
+    std::ofstream file;
+    file.open(fileName + ".msg");
+
+    for(int m : cMessage){
+        file << m << "\n";
+    }
+
+    file.close();
+}
 
 int main(int argc, char* argv[]){
 
-    //TODO: make it command line compatible
     std::array<long long unsigned int, 2> key;
 
     if(argc == 1){
@@ -128,14 +122,20 @@ int main(int argc, char* argv[]){
 
     std::string message = "";
     std::cout << "Write the message you want to encrypt: ";
-    std::cin >> message;
+    std::getline(std::cin, message);
     std::vector<int> mAscii = String_To_Ascii(message);
 
     std::vector<int> cAscii = encryption(mAscii, key[0], key[1]);
 
-    for(int m : cAscii){
-        std::cout << m << "\n";
+    std::string fileName = "";
+    std::cout << "Enter the file name (default: message): ";
+    std::getline(std::cin, fileName);
+    
+    if(fileName == ""){
+        fileName = "message";
     }
+
+    toFile(cAscii, fileName);
 
     return 0;
 }
