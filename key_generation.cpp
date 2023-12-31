@@ -138,16 +138,14 @@ void toFile(std::string fileName, unsigned long long int n, unsigned long long i
 }
 
 
-int main() {
-    
-    //TODO: make it command line compatible
+int main(int argc, char* argv[]) {
 
     unsigned long long p_primeNumber = randomPrimeGenerator(100000);
     unsigned long long q_primeNumber = randomPrimeGenerator(100000);
 
     if (p_primeNumber > 0 && q_primeNumber > std::numeric_limits<unsigned long long>::max() / p_primeNumber) {
         std::cerr << "Error: Multiplication would overflow.\n";
-        return 1;  // Return an error code
+        return 1;
     }
     
     unsigned long long n_primeNumber = p_primeNumber * q_primeNumber;
